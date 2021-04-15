@@ -31,6 +31,7 @@ class Bill{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Date billingDate;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long customerId;
     @Transient
     private Customer customer;
@@ -43,6 +44,7 @@ class Bill{
 class ProductItem{
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long productID;
     @Transient
     private Product product;
@@ -169,9 +171,8 @@ class BillRestController{
 
     @GetMapping("/fullBill/{id}")
     public Bill getBill(@PathVariable(name = "id") Long id){
-        System.out.println("********************");
         Bill bill = billRepository.findById(id).get();
-        bill.setCustomer(customerService.findCustomerById(bill.getId()));
+        bill.setCustomer(customerService.findCustomerById(bill.getCustomerId()));
         bill.getProductItems().forEach(productItem -> {
             productItem.setProduct(inventoryService.findProductById(productItem.getProductID()));
         });
